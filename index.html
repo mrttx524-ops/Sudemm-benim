@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sude — Seni Çok Seviyorum</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Dancing+Script:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Cormorant Garamond', serif; background: #1a0508; color: #fff5f7; overflow-x: hidden; min-height: 100vh; }
+  .font-display { font-family: 'Playfair Display', serif; }
+  .font-script { font-family: 'Dancing Script', cursive; }
+  .font-serif-soft { font-family: 'Cormorant Garamond', serif; }
+
+  .bg-video { position: fixed; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; filter: brightness(0.45) saturate(1.2); }
+  .bg-overlay { position: fixed; inset: 0; z-index: 1; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 20% 10%, rgba(255, 87, 122, 0.35), transparent 55%),
+      radial-gradient(ellipse at 80% 80%, rgba(180, 18, 50, 0.45), transparent 60%),
+      linear-gradient(180deg, rgba(26, 5, 8, 0.55) 0%, rgba(45, 8, 20, 0.65) 50%, rgba(26, 5, 8, 0.85) 100%);
+  }
+  .bg-grain { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.08;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  .content-layer { position: relative; z-index: 10; transition: filter .6s ease; filter: blur(6px); }
+  .content-layer.unlocked { filter: none; }
+
+  .hearts-container { position: fixed; inset: 0; z-index: 3; pointer-events: none; overflow: hidden; }
+  .heart { position: absolute; top: -40px; color: #ff5778; animation: fall linear infinite; filter: drop-shadow(0 0 8px rgba(255, 87, 120, 0.6)); }
+  @keyframes fall {
+    0% { transform: translateY(-10vh) rotate(0deg) scale(0.6); opacity: 0; }
+    10% { opacity: 1; } 90% { opacity: 1; }
+    100% { transform: translateY(110vh) rotate(360deg) scale(1); opacity: 0; }
+  }
+  .heart-pulse { display: inline-block; animation: heartbeat 1.4s ease-in-out infinite; filter: drop-shadow(0 0 20px rgba(255, 87, 120, 0.7)); }
+  @keyframes heartbeat { 0%,100%{transform:scale(1)} 20%{transform:scale(1.18)} 40%{transform:scale(.95)} 60%{transform:scale(1.12)} }
+  .float-slow { animation: float 6s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 1s ease, transform 1s ease; }
+  .reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+  section { padding: 96px 24px; }
+  .hero { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; position: relative; }
+
+  .glow-text { text-shadow: 0 0 20px rgba(255, 87, 120, 0.6), 0 0 40px rgba(255, 87, 120, 0.4), 0 4px 12px rgba(0, 0, 0, 0.6); }
+
+  h1.name { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(72px, 14vw, 168px); color: #fff5f7; line-height: 1; }
+  h2.subtitle { font-family: 'Cormorant Garamond', serif; font-size: clamp(22px, 3.5vw, 38px); color: #ffd9e0; letter-spacing: 0.15em; text-transform: uppercase; }
+  h3.section-title { font-family: 'Playfair Display', serif; font-size: clamp(26px, 4vw, 40px); color: #fff5f7; text-align: center; }
+  .kicker { font-family: 'Dancing Script', cursive; font-size: clamp(22px, 3vw, 32px); color: #ff8aa0; text-align: center; margin-bottom: 8px; }
+
+  .heart-divider { display: flex; align-items: center; justify-content: center; gap: 16px; color: rgba(255, 200, 210, 0.6); margin: 24px 0; }
+  .heart-divider::before, .heart-divider::after { content: ''; height: 1px; width: 80px; background: linear-gradient(90deg, transparent, rgba(255, 200, 210, 0.5), transparent); }
+
+  .btn-love { background: linear-gradient(135deg, #ff5778, #b41232); color: #fff5f7; padding: 14px 36px; border-radius: 999px;
+    font-family: 'Playfair Display', serif; font-size: 16px; letter-spacing: .05em; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+    transition: transform .3s ease, box-shadow .3s ease; box-shadow: 0 10px 30px rgba(255,87,120,.35); margin-top: 24px;
+  }
+  .btn-love:hover { transform: translateY(-2px) scale(1.03); box-shadow: 0 18px 50px rgba(255,87,120,.55); }
+
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 32px; max-width: 1100px; margin: 32px auto 0; }
+  .polaroid { background: #fff5f7; padding: 16px 16px 56px 16px; border-radius: 4px; box-shadow: 0 20px 50px rgba(0,0,0,.55), 0 0 0 1px rgba(255,200,210,.1); transition: transform .5s cubic-bezier(.2,.8,.2,1), box-shadow .5s ease; position: relative; }
+  .polaroid:hover { transform: translateY(-8px) rotate(0deg) !important; box-shadow: 0 30px 70px rgba(255,87,120,.35); z-index: 20; }
+  .polaroid img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; border-radius: 2px; }
+  .polaroid .caption { position: absolute; bottom: 16px; left: 0; right: 0; text-align: center; font-family: 'Dancing Script', cursive; color: #b41232; font-size: 22px; }
+
+  .letter-wrap { max-width: 720px; margin: 0 auto; }
+  .letter-card { background: linear-gradient(135deg, rgba(255,245,247,.97), rgba(255,228,235,.94)); border: 1px solid rgba(255,87,120,.3);
+    box-shadow: 0 30px 80px rgba(180,18,50,.4), inset 0 0 60px rgba(255,200,210,.4); color: #4a0a18; padding: clamp(28px, 5vw, 64px); border-radius: 6px; position: relative; }
+  .letter-card::before { content: ''; position: absolute; inset: 8px; border: 1px dashed rgba(180,18,50,.25); pointer-events: none; border-radius: 4px; }
+  .letter-card p { font-size: clamp(16px, 1.6vw, 20px); line-height: 1.7; margin-bottom: 18px; }
+  .letter-card .signature { text-align: right; font-style: italic; color: #7a1228; }
+  .letter-card .opening { font-family: 'Dancing Script', cursive; font-size: 36px; color: #b41232; text-align: center; margin-bottom: 24px; }
+  .letter-card .closing { font-family: 'Dancing Script', cursive; font-size: 30px; color: #b41232; text-align: center; padding-top: 12px; }
+
+  .envelopes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 720px; margin: 32px auto 0; }
+  @media (min-width: 640px) { .envelopes { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+  .envelope { position: relative; aspect-ratio: 4/3; border-radius: 8px; cursor: pointer; border: none;
+    background: linear-gradient(135deg, #ff5778, #b41232);
+    box-shadow: 0 10px 30px rgba(180,18,50,.35), inset 0 -2px 0 rgba(0,0,0,.15);
+    transition: transform .4s ease, box-shadow .4s ease; padding: 0; overflow: hidden; color: #fff5f7;
+  }
+  .envelope:hover { transform: translateY(-6px) rotate(-2deg); box-shadow: 0 18px 45px rgba(255,87,120,.55); }
+  .envelope:hover .env-flap { transform: rotateX(-160deg); }
+  .env-flap { position: absolute; top: 0; left: 0; right: 0; height: 60%;
+    background: linear-gradient(135deg, #ffb3c1, #ff5778);
+    clip-path: polygon(0 0, 100% 0, 50% 100%);
+    transform-origin: top center; transition: transform .6s ease;
+  }
+  .env-body { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 14px; gap: 4px; }
+  .env-icon { width: 28px; height: 28px; opacity: .9; }
+  .env-num { font-family: 'Playfair Display', serif; font-style: italic; font-size: 16px; opacity: .85; }
+  .env-title { font-family: 'Dancing Script', cursive; font-size: clamp(20px, 3vw, 28px); }
+
+  .modal { position: fixed; inset: 0; z-index: 200; display: flex; align-items: center; justify-content: center;
+    background: rgba(10, 2, 4, 0.7); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); padding: 20px; animation: fade .4s ease-out; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .modal.hidden { display: none; }
+  .mini-card { max-width: 480px; width: 100%; padding: 36px 28px;
+    background: linear-gradient(135deg, rgba(255,245,247,.98), rgba(255,228,235,.96));
+    border: 1px solid rgba(255,87,120,.4); border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(180,18,50,.5); animation: pop .5s cubic-bezier(.2,.8,.2,1); text-align: center; color: #4a0a18;
+  }
+  @keyframes pop { from { transform: scale(.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .mini-card .mini-title { font-family: 'Dancing Script', cursive; font-size: 32px; color: #b41232; }
+  .mini-card .mini-body { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(16px, 1.8vw, 20px); line-height: 1.6; color: #4a0a18; }
+
+  .ring-modal { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center;
+    background: rgba(10, 2, 4, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding: 20px; animation: fade .6s ease-out; }
+  .ring-glow { position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(255,87,120,.35), transparent 60%);
+    animation: glowPulse 3s ease-in-out infinite;
+  }
+  @keyframes glowPulse { 0%,100%{opacity:.6} 50%{opacity:1} }
+  .ring-stage { position: relative; text-align: center; max-width: 460px; z-index: 1; }
+  .ring-svg { width: 220px; height: auto; filter: drop-shadow(0 0 30px rgba(255,87,120,.7)); animation: ringIn 1.2s cubic-bezier(.2,.8,.2,1); }
+  @keyframes ringIn { 0%{transform:scale(.3) rotate(-15deg); opacity:0} 60%{transform:scale(1.1) rotate(5deg); opacity:1} 100%{transform:scale(1) rotate(0)} }
+  .ring-title { font-family: 'Dancing Script', cursive; font-size: clamp(30px, 5vw, 46px); color: #fff5f7; margin-top: 16px; text-shadow: 0 0 20px rgba(255,87,120,.6); }
+  .ring-sub { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(15px, 2vw, 18px); color: #ffd9e0; margin-top: 12px; line-height: 1.6; }
+
+  .enter-gate { position: fixed; inset: 0; z-index: 400;
+    background: radial-gradient(ellipse at center, rgba(45,8,20,.85), rgba(10,2,4,.96));
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+  }
+  .enter-gate.hidden { display: none; }
+  .enter-inner { text-align: center; padding: 32px; }
+  .enter-kicker { font-family: 'Dancing Script', cursive; font-size: clamp(20px, 3vw, 28px); color: #ff8aa0; margin-bottom: 8px; }
+  .enter-title { font-family: 'Playfair Display', serif; font-style: italic; font-size: clamp(64px, 10vw, 120px); color: #fff5f7; line-height: 1; text-shadow: 0 0 24px rgba(255,87,120,.55); }
+  .enter-sub { color: #ffd9e0; margin-top: 16px; font-style: italic; font-size: clamp(16px, 2vw, 20px); }
+
+  .spotify-bar { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%) translateY(120%); width: min(560px, calc(100% - 24px)); z-index: 50;
+    background: rgba(20, 4, 10, 0.55); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255, 200, 210, 0.2); border-radius: 16px; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,.6); transition: transform .8s cubic-bezier(.2,.8,.2,1);
+  }
+  .spotify-bar.show { transform: translateX(-50%) translateY(0); }
+  .spotify-bar iframe { display: block; border-radius: 16px; }
+
+  ::selection { background: #ff5778; color: #fff5f7; }
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #1a0508; }
+  ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff5778, #b41232); border-radius: 10px; }
+
+  @media (max-width: 640px) {
+    .heart-divider::before, .heart-divider::after { width: 40px; }
+    section { padding: 64px 20px; }
+    .spotify-bar { bottom: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<video class="bg-video" autoplay muted loop playsinline
+  src="https://customer-assets.emergentagent.com/job_sweetheart-site-28/artifacts/szog6kod_VID_20260327_160517_900.mp4"></video>
+<div class="bg-overlay"></div>
+<div class="bg-grain"></div>
+<div class="hearts-container" id="hearts" aria-hidden="true"></div>
+
+<div class="enter-gate" id="gate">
+  <div class="enter-inner">
+    <p class="enter-kicker">sana bir mesajım var</p>
+    <h1 class="enter-title">Sude</h1>
+    <p class="enter-sub">tıkla, müziğimiz başlasın ♥</p>
+    <button class="btn-love" type="button">♥ İçeri Gir</button>
+  </div>
+</div>
+
+<div class="spotify-bar" id="spotifyBar">
+  <iframe id="spotifyFrame" title="Bizim şarkımız" width="100%" height="80" frameborder="0"
+    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+    loading="lazy" src="about:blank"></iframe>
+</div>
+
+<div class="ring-modal hidden" id="ringModal">
+  <div class="ring-glow"></div>
+  <div class="ring-stage">
+    <svg viewBox="0 0 200 220" class="ring-svg" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="diamond" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#fff" />
+          <stop offset="40%" stop-color="#ffe9ef" />
+          <stop offset="100%" stop-color="#ff5778" />
+        </radialGradient>
+        <linearGradient id="goldBand" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#ffd9e0" />
+          <stop offset="50%" stop-color="#ff8aa0" />
+          <stop offset="100%" stop-color="#b41232" />
+        </linearGradient>
+      </defs>
+      <ellipse cx="100" cy="160" rx="55" ry="48" fill="none" stroke="url(#goldBand)" stroke-width="14" />
+      <ellipse cx="100" cy="160" rx="55" ry="48" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" />
+      <polygon points="100,40 130,85 100,130 70,85" fill="url(#diamond)" stroke="#fff" stroke-width="1.5" />
+      <polyline points="80,70 110,55 122,82" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2" stroke-linecap="round" />
+    </svg>
+    <p class="ring-title">benimle evlenir misin?</p>
+    <p class="ring-sub">— şaka bir yana, hayatımın her gününde seninle olmak istiyorum, Sude.</p>
+    <button class="btn-love" type="button" id="ringClose">♥ Evet diyorum sana</button>
+  </div>
+</div>
+
+<div class="modal hidden" id="miniModal">
+  <div class="mini-card">
+    <p class="mini-title" id="miniTitle">—</p>
+    <div class="heart-divider" style="color:#b41232"><span>♥</span></div>
+    <p class="mini-body" id="miniBody">—</p>
+    <button class="btn-love" type="button" id="miniClose">Kapat</button>
+  </div>
+</div>
+
+<div class="content-layer" id="content">
+
+  <section class="hero">
+    <div class="reveal is-visible">
+      <p class="kicker">kalbimin en güzel sebebi</p>
+      <h1 class="name glow-text">Sude</h1>
+      <div class="heart-divider"><span class="heart-pulse" style="font-size:24px;color:#ff5778">♥</span></div>
+      <h2 class="subtitle">Seni Çok Seviyorum</h2>
+      <p style="font-style:italic;font-size:18px;color:#ffb3c1;margin-top:24px;max-width:560px;line-height:1.6;margin-left:auto;margin-right:auto">
+        Bu küçük site, kelimelerin hep eksik kaldığı o his için — sana, sadece sana.
+      </p>
+    </div>
+    <div class="float-slow" style="position:absolute;bottom:32px;left:50%;transform:translateX(-50%);color:#ffb3c1;font-size:11px;letter-spacing:0.3em;text-transform:uppercase">↓ aşağı kay</div>
+  </section>
+
+  <section class="reveal">
+    <p class="kicker">küçük anılar</p>
+    <h3 class="section-title">Sana Bakmaktan Yorulmadığım Kareler</h3>
+    <div class="heart-divider"><span style="font-size:18px">♥</span></div>
+    <div class="gallery">
+      <div class="polaroid" style="transform:rotate(-4deg)">
+        <img src="https://customer-assets.emergentagent.com/job_sweetheart-site-28/artifacts/iqszpsdh_Screenshot_2026-03-18-08-38-13-954_com.instagram.android-edit.jpg" alt="o bakış">
+        <div class="caption">o bakış...</div>
+      </div>
+      <div class="polaroid" style="transform:rotate(3deg)">
+        <img src="https://customer-assets.emergentagent.com/job_sweetheart-site-28/artifacts/yt3bst6a_Screenshot_2026-03-18-03-00-44-861_com.instagram.android.jpg" alt="kalbimin en'i">
+        <div class="caption">kalbimin en'i</div>
+      </div>
+      <div class="polaroid" style="transform:rotate(-2deg)">
+        <img src="https://customer-assets.emergentagent.com/job_sweetheart-site-28/artifacts/o44ca1fp_Screenshot_2026-03-30-00-46-49-098_com.miui.gallery.jpg" alt="gülüşün">
+        <div class="caption">gülüşün</div>
+      </div>
+      <div class="polaroid" style="transform:rotate(4deg)">
+        <img src="https://customer-assets.emergentagent.com/job_sweetheart-site-28/artifacts/wfo7kogc_IMG_20260506_103332.jpg" alt="iyi ki varsın">
+        <div class="caption">iyi ki varsın</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="reveal">
+    <p class="kicker">seni sevmemin küçük nedenleri</p>
+    <h3 class="section-title">6 Küçük Mektup</h3>
+    <p style="text-align:center;font-style:italic;color:#ffb3c1;margin-top:8px">her birine dokun, içini oku ♥</p>
+    <div class="envelopes" id="envelopes"></div>
+  </section>
+
+  <section id="letter" class="reveal">
+    <div class="letter-wrap">
+      <div class="letter-card">
+        <p class="opening">Sevgili Sude,</p>
+        <p>Sana ne zaman bir şey yazmak istesem kelimeler küçük kalıyor. Sanki dilimiz seni anlatmak için icat edilmemiş gibi… O yüzden bu sefer kalemi bırakıp kalbimi konuşturuyorum.</p>
+        <p>Sen, sabahları perdeden süzülen ilk ışıksın; gözlerimi açtığımda ilk aklıma gelen, gece kapadığımda son düşündüğüm. Gülüşün benim en sessiz duamın cevabı, sesin günümün en güzel şarkısı, varlığın ise hayatımın anlamı.</p>
+        <p>Belki dünya hızlı dönüyor, belki günler birbirine karışıyor — ama sen elimi tuttuğunda zaman duruyor, kalbim sadece sana vuruyor.</p>
+        <p class="closing">Seni çok ama çok seviyorum.</p>
+        <p class="signature">— sonsuza kadar senin</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="reveal" style="text-align:center;padding:80px 24px 140px">
+    <div class="heart-divider"><span class="heart-pulse" style="color:#ff5778;font-size:20px">♥</span></div>
+    <p class="font-display glow-text" style="font-style:italic;font-size:clamp(20px,2.5vw,28px);color:#fff5f7">"Sen benim için bir tesadüf değil, bir mucizesin."</p>
+    <p class="font-script" style="font-size:28px;color:#ff8aa0;margin-top:24px">— senin için, Sude</p>
+    <p style="font-size:11px;text-transform:uppercase;letter-spacing:0.3em;color:rgba(255,179,193,0.6);margin-top:48px">sonsuza kadar ♥</p>
+  </footer>
+
+</div>
+<script>
+  // Falling hearts
+  (function () {
+    const c = document.getElementById('hearts');
+    for (let i = 0; i < 28; i++) {
+      const s = document.createElement('span');
+      s.className = 'heart'; s.textContent = '♥';
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.fontSize = (14 + Math.random() * 22) + 'px';
+      s.style.animationDuration = (7 + Math.random() * 9) + 's';
+      s.style.animationDelay = (Math.random() * 12) + 's';
+      s.style.opacity = (0.4 + Math.random() * 0.6).toFixed(2);
+      c.appendChild(s);
+    }
+  })();
+
+  // 6 mini letters
+  const MINI_LETTERS = [
+    { title: "Gülüşün", body: "Sen güldüğünde dünyam aydınlanıyor. O gülüşü ömrümün sonuna kadar görmek istiyorum." },
+    { title: "Sesin", body: "Adımı sen söyleyince başkalaşıyor. Sesin, kalbimin duyduğu en güzel melodi." },
+    { title: "Bakışların", body: "Bana baktığında, dünya susuyor. O gözlerde kendimi buluyorum, kendimi seviyorum." },
+    { title: "Kokun", body: "Olmadığında bile yastığımda kalıyor. Sen evimsin, sen huzurumsun." },
+    { title: "Kalbin", body: "Saf, güzel, biricik. İyi ki o kalp benim kalbimle aynı ritimde atıyor." },
+    { title: "Sen", body: "Sebep aramaya gerek yok aslında. Sen olduğun için seviyorum, başka da bir nedeni yok." }
+  ];
+  (function buildEnvelopes() {
+    const wrap = document.getElementById('envelopes');
+    MINI_LETTERS.forEach((l, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'envelope'; btn.type = 'button';
+      btn.innerHTML = `
+        <div class="env-flap"></div>
+        <div class="env-body">
+          <svg class="env-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+          <span class="env-num">№ ${i + 1}</span>
+          <span class="env-title">${l.title}</span>
+        </div>`;
+      btn.addEventListener('click', () => openMini(i));
+      wrap.appendChild(btn);
+    });
+  })();
+
+  // Modal helpers
+  const miniModal = document.getElementById('miniModal');
+  const miniTitle = document.getElementById('miniTitle');
+  const miniBody = document.getElementById('miniBody');
+  function openMini(i) {
+    miniTitle.textContent = MINI_LETTERS[i].title;
+    miniBody.textContent = MINI_LETTERS[i].body;
+    miniModal.classList.remove('hidden');
+  }
+  function closeMini() { miniModal.classList.add('hidden'); }
+  document.getElementById('miniClose').addEventListener('click', closeMini);
+  miniModal.addEventListener('click', (e) => { if (e.target === miniModal) closeMini(); });
+
+  // Ring modal
+  const ringModal = document.getElementById('ringModal');
+  document.getElementById('ringClose').addEventListener('click', () => ringModal.classList.add('hidden'));
+  ringModal.addEventListener('click', (e) => { if (e.target === ringModal) ringModal.classList.add('hidden'); });
+
+  // Reveal on scroll
+  (function () {
+    const els = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('is-visible'); io.unobserve(e.target); } });
+    }, { threshold: 0.15 });
+    els.forEach(el => io.observe(el));
+  })();
+
+  // Enter gate -> start music + ring timer
+  const gate = document.getElementById('gate');
+  const content = document.getElementById('content');
+  const spotifyBar = document.getElementById('spotifyBar');
+  const spotifyFrame = document.getElementById('spotifyFrame');
+  function enterSite() {
+    gate.classList.add('hidden');
+    content.classList.add('unlocked');
+    spotifyFrame.src = "https://open.spotify.com/embed/track/3vRq03R2E6ovWKhAPhNm5i?utm_source=generator&theme=0&autoplay=1";
+    spotifyBar.classList.add('show');
+    setTimeout(() => ringModal.classList.remove('hidden'), 15000);
+  }
+  gate.addEventListener('click', enterSite);
+</script>
+</body>
+</html>
